@@ -10,11 +10,25 @@ const imageOptions = {
     easy: {
         sufix: 'easy',
         height: 10,
+        edgeDetection: false,
+        fillPercent: 15,
+    },
+    easy_edge: {
+        sufix: 'easy_edge',
+        height: 15,
+        edgeDetection: true,
         fillPercent: 15,
     },
     hard: {
         sufix: 'hard',
         height: 15,
+        edgeDetection: false,
+        fillPercent: 25,
+    },
+    hard_edge: {
+        sufix: 'hard_edge',
+        height: 15,
+        edgeDetection: true,
         fillPercent: 25,
     },
 }
@@ -63,11 +77,15 @@ function buildAllNonograms(path) {
                 }
             }
 
-            nonogramParser.buildNonogram(path, fileName, extension, imageOptions.easy, cb1(imageOptions.easy.sufix))
-            await utils.sleep(sleepTimeMs)
+            const optionsKeys = Object.keys(imageOptions)
+            const length = optionsKeys.length
+            for (let i = 0; i < length; i++) {
+                const options = imageOptions[optionsKeys[i]]
 
-            nonogramParser.buildNonogram(path, fileName, extension, imageOptions.hard, cb2(imageOptions.hard.sufix))
-            await utils.sleep(sleepTimeMs)
+                const cb = i === optionsKeys.length - 1 ? cb2 : cb1
+                nonogramParser.buildNonogram(path, fileName, extension, options, cb(options.sufix))
+                await utils.sleep(sleepTimeMs)
+            }
         })
     })
 }

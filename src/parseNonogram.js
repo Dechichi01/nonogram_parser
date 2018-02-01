@@ -29,6 +29,9 @@ module.exports.buildNonogram = function sendToNonogramSolver(dirPath, fileName, 
     form.append('upload_image', fs.createReadStream(`${__dirname}/../${filePath}`))
 
     form.append('height', options.height)
+    if (options.edgeDetection) {
+        form.append('edge', 1)
+    }
     form.append('button', 'make the puzzle')
     form.append('otherlogo', 'n')
     form.append('repeat', 4)
