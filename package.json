@@ -17,6 +17,7 @@
     "pdf2json": "^1.1.7",
     "pdf2text": "^1.1.0",
     "pdfkit": "^0.8.3",
+    "png-to-jpeg": "^1.0.1",
     "request": "^2.83.0",
     "unoconv2": "^1.0.0"
   },

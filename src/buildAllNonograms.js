@@ -2,9 +2,7 @@ const fs = require('fs')
 const nonogramParser = require('./parseNonogram.js')
 const utils = require('./utils.js')
 
-const nonogramsPath = `${__dirname}/../nonograms`
 const dirRelativePath = process.argv[2]
-const sleepTimeMs = 1000
 
 const imageOptions = {
     easy: {
@@ -15,79 +13,61 @@ const imageOptions = {
     },
     easy_edge: {
         sufix: 'easy_edge',
-        height: 15,
+        height: 10,
         edgeDetection: true,
         fillPercent: 15,
+    },
+    medium: {
+        sufix: 'medium',
+        height: 10,
+        edgeDetection: false,
+        fillPercent: 25,
+    },
+    medium_edge: {
+        sufix: 'medium_edge',
+        height: 10,
+        edgeDetection: true,
+        fillPercent: 25,
     },
     hard: {
         sufix: 'hard',
         height: 15,
         edgeDetection: false,
-        fillPercent: 25,
+        fillPercent: 35,
     },
     hard_edge: {
         sufix: 'hard_edge',
         height: 15,
         edgeDetection: true,
-        fillPercent: 25,
+        fillPercent: 35,
     },
 }
 
 function buildAllNonograms(path) {
-    const images = []
-
-    fs.readdir(path, (err, files) => {
+    fs.readdir(path, async (err, files) => {
         if (err) {
             console.log(err)
             return
         }
-        
-        files.forEach(async (f, i) => {
+
+        for (let i = 0; i < files.length; i++) {
+            const f = files[i]
             const nameAndExt = f.split('.')
             const fileName = nameAndExt[0]
             const extension = nameAndExt[1]
 
-            const imageObj = {
-                id: fileName,
-                nonograms: {},
+            if (extension !== 'jpg') {
+                continue
             }
 
-            const cb1 = (sufix) => (err,json) => {
-                if (err) {
-                    console.log(err)
-                    return
-                }
-                imageObj.nonograms[sufix] = json
-            }
-
-            const cb2 = (sufix) => (err, json) => {
-                cb1(sufix)(err, json)
-                images.push(imageObj)
-                
-                console.log('Finished building nanogram for image: ' + f)
-                if (images.length == files.length) {
-                    const imagesJson = JSON.stringify(images, null, '\t')
-                    const imagesPath = `${nonogramsPath}/images.json` 
-                    fs.writeFile(imagesPath, imagesJson, function (err) {
-                        if (err) {
-                            console.log(err)
-                            return
-                        }
-                    })
-                }
-            }
-
-            const optionsKeys = Object.keys(imageOptions)
-            const length = optionsKeys.length
-            for (let i = 0; i < length; i++) {
-                const options = imageOptions[optionsKeys[i]]
-
-                const cb = i === optionsKeys.length - 1 ? cb2 : cb1
-                nonogramParser.buildNonogram(path, fileName, extension, options, cb(options.sufix))
-                await utils.sleep(sleepTimeMs)
-            }
-        })
+            await nonogramParser.buildNonogram(path, fileName, extension, imageOptions.easy)
+            await nonogramParser.buildNonogram(path, fileName, extension, imageOptions.easy_edge)
+            await nonogramParser.buildNonogram(path, fileName, extension, imageOptions.medium)
+            await nonogramParser.buildNonogram(path, fileName, extension, imageOptions.medium_edge)
+            await nonogramParser.buildNonogram(path, fileName, extension, imageOptions.hard)
+            await nonogramParser.buildNonogram(path, fileName, extension, imageOptions.hard_edge)
+        }
     })
 }
 
-buildAllNonograms(dirRelativePath)
+//buildAllNonograms(dirRelativePath)
