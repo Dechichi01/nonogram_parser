@@ -47,7 +47,7 @@ function parseAll(path) {
             imageObj.nonograms[fileSufix] = json
         }
 
-        const imagesStr = JSON.stringify(images, null, 4)
+        const imagesStr = JSON.stringify({images}, null, 4)
         fs.writeFile(`${nonogramsPath}/images.json`, imagesStr, (err) => {
             if (err) {
                 console.log(err)
